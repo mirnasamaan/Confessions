@@ -10,6 +10,7 @@ import com.example.marvoot.testingandroid.Model.UserInteraction;
 import com.example.marvoot.testingandroid.Model.Confession;
 import com.example.marvoot.testingandroid.Model.ConfessionService;
 import com.example.marvoot.testingandroid.Model.ConfessionsFilter;
+import com.example.marvoot.testingandroid.View.ConfessionActivity;
 import com.example.marvoot.testingandroid.View.MainActivity;
 import com.example.marvoot.testingandroid.databinding.ActivityConfessionsBinding;
 import com.example.marvoot.testingandroid.databinding.NeutralConfessionBinding;
@@ -111,7 +112,7 @@ public class ConfessionsViewModel implements ViewModel {
                                 dataListener.onConfessionsAdded(addedConfessions);
                             }
                         }
-                        MainActivity.processing = false;
+                        ConfessionActivity.processing = false;
                     }
 
                     @Override

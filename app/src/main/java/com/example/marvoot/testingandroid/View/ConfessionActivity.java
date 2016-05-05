@@ -7,7 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.databinding.DataBindingUtil;
@@ -39,7 +39,6 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
     int count = 6;
     int lastConfId = -1;
 
-
     public static Intent newIntent(Context context, UserData userData) {
         Intent intent = new Intent(context, ConfessionActivity.class);
         intent.putExtra(CONFESSION, userData);
@@ -49,7 +48,6 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_confessions);
         confessionsViewModel = new ConfessionsViewModel(this, this);
         binding.setViewModel(confessionsViewModel);
@@ -100,9 +98,10 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
     }
 
     @Override
-    public void onConfessionsChanged(List<Confession> confessions) {;
+    public void onConfessionsChanged(List<Confession> fetchedConfessions) {
         ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
-        adapter.setConfessions(confessions);
+        adapter.clearConfessions();
+        adapter.setConfessions(fetchedConfessions);
         //adapter.notifyDataSetChanged();
         binding.recyclerView.setAdapter(adapter);
         //adapter.notifyItemRangeChanged(0, adapter.getItemCount());
@@ -115,8 +114,15 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
     }
 
     public void userInteraction(int position) {
-        ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
-        adapter.notifyItemChanged(position);
+        try {
+            ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
+            adapter.notifyItemChanged(position);
+            Log.i("userInteraction pos", position+"");
+        }
+        catch(Exception ex)
+        {
+            Log.e("userInteraction err", ex.toString());
+        }
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
@@ -130,7 +136,7 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 int last = layoutManager.getItemCount();
                 int last_visible = layoutManager.findLastVisibleItemPosition();
-                if(last == last_visible + 1) {
+                if (last == last_visible + 1) {
                     View lastItem = layoutManager.findViewByPosition(last_visible);
                     lastConfId = Integer.parseInt(lastItem.getTag(R.string.ConfId).toString());
 

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Dat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SessionManagement new_session = new SessionManagement(this);
-        //new_session.logoutUser();
+        new_session.logoutUser();
         HashMap<String, String> hashMap = new HashMap<String, String>();
         hashMap = new_session.getUserDetails();
         String empty = "";
