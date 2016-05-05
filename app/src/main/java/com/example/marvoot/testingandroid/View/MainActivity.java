@@ -1,57 +1,64 @@
 package com.example.marvoot.testingandroid.View;
 
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.databinding.DataBindingUtil;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.marvoot.testingandroid.ConfessionAdapter;
-import com.example.marvoot.testingandroid.Model.Confession;
-import com.example.marvoot.testingandroid.Model.ConfessionService;
+import com.example.marvoot.testingandroid.Model.UserData;
+import com.example.marvoot.testingandroid.PublicFunctions.SessionManagement;
 import com.example.marvoot.testingandroid.R;
-import com.example.marvoot.testingandroid.ViewModel.ConfessionsViewModel;
-import com.example.marvoot.testingandroid.databinding.ActivityConfessionsBinding;
+import com.example.marvoot.testingandroid.ViewModel.MainViewModel;
+import com.example.marvoot.testingandroid.databinding.ActivityMainBinding;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
-import rx.Subscription;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends AppCompatActivity implements ConfessionService.DataListener, SwipeRefreshLayout.OnRefreshListener {
 
-    public static ConfessionsViewModel confessionsViewModel;
-    private ActivityConfessionsBinding binding;
-    private Subscription subscription;
-    SwipeRefreshLayout swipeRefreshLayout;
-    private ArrayList<Confession> confList;
-    public static boolean processing = false;
-    int page = 0;
-    int count = 6;
-    int lastConfId = -1;
+public class MainActivity extends AppCompatActivity implements MainViewModel.DataListener {
+
+
+    private ActivityMainBinding binding;
+    private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_confessions);
-        confessionsViewModel = new ConfessionsViewModel(this, this);
-        binding.setViewModel(confessionsViewModel);
-        setupRecyclerView((RecyclerView) findViewById(R.id.recycler_view));
-        if(!processing){
-            processing=true;
-            confessionsViewModel.loadConfessions(lastConfId, 0, count, "latest");
+        SessionManagement new_session = new SessionManagement(this);
+        //new_session.logoutUser();
+        HashMap<String, String> hashMap = new HashMap<String, String>();
+        hashMap = new_session.getUserDetails();
+        String empty = "";
+        if (hashMap.get("name") != null && !hashMap.get("name").equals(empty) && hashMap.get("email") != null && !hashMap.get("email").equals(empty)) {
+            /*CharSequence text = "You should be directed to the confessions list";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(this, text, duration);
+            toast.show();*/
+            UserData userData = new UserData();
+            userData.username = hashMap.get("name");
+            userData.password = hashMap.get("email");
+            this.startActivity(ConfessionActivity.newIntent(this, userData));
+            this.finish();
+        }
+        else {
+            binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+            mainViewModel = new MainViewModel(this, this);
+            binding.setViewModel(mainViewModel);
         }
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
 
-        setupRecyclerView(binding.recyclerView);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,65 +83,18 @@ public class MainActivity extends AppCompatActivity implements ConfessionService
     }
 
     @Override
-    public void onRefresh() {
-        page = 0;
-        lastConfId = -1;
-        if(!processing) {
-            processing = true;
-            confessionsViewModel.loadConfessions(lastConfId, 0, count, "latest");
-        }
-        swipeRefreshLayout.setRefreshing(false);
-
+    public void onUserDataChanged(UserData userdata) {
     }
 
     @Override
-    public void onConfessionsChanged(List<Confession> confessions) {;
-        ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
-        adapter.setConfessions(confessions);
-        //adapter.notifyDataSetChanged();
-        binding.recyclerView.setAdapter(adapter);
-        //adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    public void onConfessionsAdded(List<Confession> confessions) {
-        ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
-        adapter.addConfessions(confessions);
-        adapter.notifyItemRangeChanged(adapter.getItemCount(), count);
-    }
 
-    public void userInteraction(int position) {
-        ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
-        adapter.notifyItemChanged(position);
-    }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        ConfessionAdapter adapter = new ConfessionAdapter();
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                int last = layoutManager.getItemCount();
-                int last_visible = layoutManager.findLastVisibleItemPosition();
-                if(last == last_visible + 1) {
-                    View lastItem = layoutManager.findViewByPosition(last_visible);
-                    lastConfId = Integer.parseInt(lastItem.getTag(R.string.ConfId).toString());
 
-                    page++;
-                    if (!processing) {
-                        processing = true;
-                        confessionsViewModel.loadConfessions(lastConfId, 0, count, "latest");
-                    }
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
-    }
 
 }
+
+

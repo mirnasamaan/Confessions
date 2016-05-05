@@ -25,6 +25,13 @@ public interface ConfessionService {
     @POST("Interaction/BackwardInteraction")
     Observable<List<Confession>> BackwardInteraction(@Body UserInteraction interaction);
 
+    @POST("User/Register")
+    Observable<UserData> Register(@Body UserDataFilter filter);
+
+
+    @POST("User/UserLogin")
+    Observable<UserData> UserLogin(@Body UserDataFilter filter);
+
     /*@POST("Interaction/CheckUserInteraction")
     Observable<CheckUserInteraction> CheckUserInteraction(@Body UserInteraction interaction);*/
 

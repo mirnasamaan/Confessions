@@ -19,6 +19,7 @@ android {
         exclude 'META-INF/maven/com.squareup.retrofit2/retrofit/pom.xml'
         exclude 'META-INF/maven/com.squareup.retrofit2/retrofit/pom.properties'
     }
+
     dataBinding {
         enabled = true
     }
@@ -44,4 +45,5 @@ dependencies {
     //compile files('libs/retrofit-2.0.1.jar')
     compile 'com.squareup.retrofit2:converter-gson:2.0.1'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.1'
+    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
 }

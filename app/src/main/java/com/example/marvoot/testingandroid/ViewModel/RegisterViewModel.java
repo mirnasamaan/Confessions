@@ -3,23 +3,18 @@ package com.example.marvoot.testingandroid.ViewModel;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.Observable;
-import android.databinding.Bindable;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.graphics.drawable.Drawable;
-import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.marvoot.testingandroid.ConfApplication;
-import com.example.marvoot.testingandroid.Model.UserData;
 import com.example.marvoot.testingandroid.Model.ConfessionService;
+import com.example.marvoot.testingandroid.Model.UserData;
 import com.example.marvoot.testingandroid.Model.UserDataFilter;
 import com.example.marvoot.testingandroid.PublicFunctions.AlertMessages;
 import com.example.marvoot.testingandroid.PublicFunctions.CheckInternetConnection;
@@ -29,15 +24,12 @@ import com.example.marvoot.testingandroid.R;
 import com.example.marvoot.testingandroid.View.ConfessionActivity;
 import com.example.marvoot.testingandroid.View.RegisterActivity;
 
-import java.util.HashMap;
-import java.util.List;
-import cz.msebera.android.httpclient.HttpException;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
 
-public class MainViewModel implements ViewModel {
+public class RegisterViewModel implements ViewModel {
 
 
     private Context context;
@@ -46,24 +38,40 @@ public class MainViewModel implements ViewModel {
     private UserData userdata;
     private String editTextUsernameValue;
     private String editTextPasswordValue;
+    private String editTextGenderValue;
+    private String GenderValue;
     public ObservableField<String> username_field_error;
     public ObservableField<String> password_field_error;
+    public ObservableField<String> gender_field_error;
     public ObservableField<Drawable> username_field_icon;
     public ObservableField<Drawable> password_field_icon;
+    public ObservableField<Drawable> gender_field_icon_right;
+    public ObservableField<Drawable> gender_field_icon_left;
+    public ObservableInt genderButtonVisibility;
+    public ObservableField<String> gender_text;
     AlertMessages alertMessages;
 
 
-    public MainViewModel(Context context, DataListener dataListener) {
+    public RegisterViewModel(Context context, DataListener dataListener) {
         this.context = context;
         this.dataListener = dataListener;
         this.username_field_error = new ObservableField<>(null);
         this.password_field_error = new ObservableField<>(null);
+        this.gender_field_error = new ObservableField<>(null);
         this.username_field_icon = new ObservableField<>(null);
         this.password_field_icon = new ObservableField<>(null);
+        this.gender_field_icon_right = new ObservableField<>(null);
+        this.gender_field_icon_left = new ObservableField<>(null);
         Drawable username_icon = context.getResources().getDrawable(R.drawable.people);
         Drawable password_icon = context.getResources().getDrawable(R.drawable.tool);
+        Drawable gender_right_icon = context.getResources().getDrawable(R.drawable.man);
+        Drawable gender_left_icon = context.getResources().getDrawable(R.drawable.arrows);
         username_field_icon.set(username_icon);
         password_field_icon.set(password_icon);
+        gender_field_icon_right.set(gender_right_icon);
+        gender_field_icon_left.set(gender_left_icon);
+        genderButtonVisibility = new ObservableInt(View.GONE);
+        gender_text = new ObservableField<>("");
         alertMessages = new AlertMessages();
     }
 
@@ -92,7 +100,7 @@ public class MainViewModel implements ViewModel {
         final ConfessionService confessionService = application.getConfessionService();
         if (subscription != null && !subscription.isUnsubscribed()) subscription.unsubscribe();
         UserDataFilter filter = new UserDataFilter(username, password, gender);
-        subscription = confessionService.UserLogin(filter)
+        subscription = confessionService.Register(filter)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(application.defaultSubscribeScheduler())
                 .subscribe(new Subscriber<UserData>() {
@@ -104,7 +112,7 @@ public class MainViewModel implements ViewModel {
                         if (dataListener != null)
                             dataListener.onUserDataChanged(userdata);
                         if (userdata != null) {
-                            if (userdata.username != null && userdata.password != null)
+                            if (userdata.username != null && userdata.password != null && userdata.gender != null)
                             {
                                 SessionManagement new_session = new SessionManagement(context);
                                 new_session.logoutUser();
@@ -122,15 +130,15 @@ public class MainViewModel implements ViewModel {
                             else
                             {
                                 PopupMessages popup = new PopupMessages();
-                                String error = "Username or Password are wrong..";
-                                popup.showAlertDialog(context, "Sorry", error, null);
+                                String error_msg = "User already exists";
+                                popup.showAlertDialog(context, "Sorry", error_msg, null);
                             }
                         }
                         else
                         {
                             PopupMessages popup = new PopupMessages();
-                            String error = "Username or Password are wrong..";
-                            popup.showAlertDialog(context, "Sorry", error, null);
+                            String error_msg = "User already exists";
+                            popup.showAlertDialog(context, "Sorry", error_msg, null);
                         }
                     }
 
@@ -145,7 +153,7 @@ public class MainViewModel implements ViewModel {
 
                     @Override
                     public void onNext(UserData userdata) {
-                        MainViewModel.this.userdata = userdata;
+                        RegisterViewModel.this.userdata = userdata;
                     }
                 });
     }
@@ -154,23 +162,27 @@ public class MainViewModel implements ViewModel {
     public void onClickSearch(View view) {
         username_field_error.set(null);
         password_field_error.set(null);
+        gender_field_error.set(null);
         String empty = "";
         if( editTextUsernameValue == null || editTextUsernameValue.equals(empty))
             username_field_error.set("Username field can't be empty");
         else
         if( editTextPasswordValue == null || editTextPasswordValue.equals(empty))
             password_field_error.set("Password field can't be empty");
+        else
+        if( editTextGenderValue == null || editTextGenderValue.equals(empty))
+            gender_field_error.set("Gender field can't be empty");
         else {
             username_field_error.set(null);
             password_field_error.set(null);
-
+            gender_field_error.set(null);
             alertMessages.ShowAlert(context, "Checking Network", "Loading..",false);
             if (CheckInternetConnection.getInstance(context).isOnline())
             {
                 //try{ Thread.sleep(3000); }catch(InterruptedException e){ }
                 alertMessages.HideAlert();
                 alertMessages.ShowAlert(context, "Please wait", "Loading..", false);
-                loadUserData(editTextUsernameValue, editTextPasswordValue, "");
+                loadUserData(editTextUsernameValue, editTextPasswordValue, GenderValue);
             }
             else
             {
@@ -183,10 +195,34 @@ public class MainViewModel implements ViewModel {
     }
 
 
-    public void onClickRegister(View view) {
-        UserData userData = new UserData();
-        context.startActivity(RegisterActivity.newIntent(context, userData));
-        ((Activity) context).finish();
+    public void onClickGender(View view) {
+        hideKeyboard(view);
+        genderButtonVisibility.set(View.VISIBLE);
+    }
+
+
+    public void onClickFemale(View view) {
+        genderButtonVisibility.set(View.GONE);
+        gender_text.set("   انثى");
+        gender_field_error.set(null);
+        gender_field_icon_right.set(null);
+        gender_field_icon_left.set(null);
+        GenderValue = "f";
+    }
+
+
+    public void onClickMale(View view) {
+        genderButtonVisibility.set(View.GONE);
+        gender_text.set("   ذكر");
+        gender_field_error.set(null);
+        gender_field_icon_right.set(null);
+        gender_field_icon_left.set(null);
+        GenderValue = "m";
+    }
+
+
+    public void onClickGenderMenu(View view) {
+
     }
 
 
@@ -244,6 +280,25 @@ public class MainViewModel implements ViewModel {
     }
 
 
+    public TextWatcher getGenderEditTextWatcher() {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                editTextGenderValue = charSequence.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        };
+    }
+
+
     public View.OnFocusChangeListener getUsernameEditFocusListner() {
         return new View.OnFocusChangeListener() {
             @Override
@@ -268,10 +323,10 @@ public class MainViewModel implements ViewModel {
     }
 
 
+
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager =(InputMethodManager)context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
-
 
 }

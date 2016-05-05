@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#52bddf</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimaryDark">#52bddf</color>
+    <color name="colorAccent">#52bddf</color>
     <color name="disliked">#696969</color>
+    <color name="White">#fff</color>
+    <color name="Black">#000</color>
+    <color name="Login_Register_Fields">#a89e9c</color>
+    <color name="Overlay">#95000000</color>
 </resources>
