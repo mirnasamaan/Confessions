@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.databinding.DataBindingUtil;
@@ -88,9 +89,10 @@ public class MainActivity extends AppCompatActivity implements ConfessionService
     }
 
     @Override
-    public void onConfessionsChanged(List<Confession> confessions) {;
+    public void onConfessionsChanged(List<Confession> fetchedConfessions) {
         ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
-        adapter.setConfessions(confessions);
+        adapter.clearConfessions();
+        adapter.setConfessions(fetchedConfessions);
         //adapter.notifyDataSetChanged();
         binding.recyclerView.setAdapter(adapter);
         //adapter.notifyItemRangeChanged(0, adapter.getItemCount());
@@ -103,8 +105,15 @@ public class MainActivity extends AppCompatActivity implements ConfessionService
     }
 
     public void userInteraction(int position) {
-        ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
-        adapter.notifyItemChanged(position);
+        try {
+            ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
+            adapter.notifyItemChanged(position);
+            Log.i("userInteraction pos", position+"");
+        }
+        catch(Exception ex)
+        {
+            Log.e("userInteraction err", ex.toString());
+        }
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
