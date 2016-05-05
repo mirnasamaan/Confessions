@@ -10,8 +10,9 @@ import com.example.marvoot.testingandroid.Model.UserInteraction;
 import com.example.marvoot.testingandroid.Model.Confession;
 import com.example.marvoot.testingandroid.Model.ConfessionService;
 import com.example.marvoot.testingandroid.Model.ConfessionsFilter;
-import com.example.marvoot.testingandroid.View.ConfessionActivity;
 import com.example.marvoot.testingandroid.View.MainActivity;
+import com.example.marvoot.testingandroid.databinding.ActivityConfessionsBinding;
+import com.example.marvoot.testingandroid.databinding.NeutralConfessionBinding;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +32,8 @@ public class ConfessionsViewModel implements ViewModel {
     private Context context;
     private Subscription subscription;
     private ConfessionService.DataListener dataListener;
-    private List<Confession> confessions;
+    private List<Confession> addedConfessions;
+    private ArrayList<Confession> allConfessions = new ArrayList<Confession>();
 
     public ConfessionsViewModel(Context context, ConfessionService.DataListener dataListener) {
         this.context = context;
@@ -55,23 +57,39 @@ public class ConfessionsViewModel implements ViewModel {
     }*/
 
     public void userInteraction(int position, int direction) {
-        Log.i("Tag", "position: " + position);
-        ConfItemViewModel confItemViewModel = new ConfItemViewModel(context, confessions.get(position));
-        String inter_type = confItemViewModel.getLoggedInUserInteractionType();
-        if(direction == 1) {
-            switch (inter_type) {
-                case "-1": confItemViewModel.setLoggedInUserInteractionType(0); break;
-                case "0": confItemViewModel.setLoggedInUserInteractionType(1); break;
-                default: break;
+        try {
+            ConfItemViewModel confItemViewModel = new ConfItemViewModel(context, this.allConfessions.get(position));
+            String inter_type = confItemViewModel.getLoggedInUserInteractionType();
+            if (direction == 1) {
+                switch (inter_type) {
+                    case "-1":
+                        confItemViewModel.setLoggedInUserInteractionType(0);
+                        break;
+                    case "0":
+                        confItemViewModel.setLoggedInUserInteractionType(1);
+                        break;
+                    default:
+                        break;
+                }
+            } else if (direction == -1) {
+                switch (inter_type) {
+                    case "1":
+                        confItemViewModel.setLoggedInUserInteractionType(0);
+                        break;
+                    case "0":
+                        confItemViewModel.setLoggedInUserInteractionType(-1);
+                        break;
+                    default:
+                        break;
+                }
             }
-        } else if(direction == -1) {
-            switch (inter_type) {
-                case "1": confItemViewModel.setLoggedInUserInteractionType(0); break;
-                case "0": confItemViewModel.setLoggedInUserInteractionType(-1); break;
-                default: break;
-            }
+            dataListener.userInteraction(position);
         }
-        dataListener.userInteraction(position);
+        catch (Exception ex){
+            Log.e("userInteractionError", ex.getMessage());
+            Log.e("userInteractionConfsize", this.allConfessions.size() + "");
+            //Log.e("userInteractionConf", this.confessions.get(0).ConfContent);
+        }
     }
 
     public void loadConfessions(final int lastConfId, int page, int count, String mode) {
@@ -87,12 +105,13 @@ public class ConfessionsViewModel implements ViewModel {
                     public void onCompleted() {
                         if (dataListener != null) {
                             if (lastConfId == -1) {
-                                dataListener.onConfessionsChanged(confessions);
+                                //ArrayList<Confession> fetchedConfessions = new ArrayList<Confession>(allConfessions);
+                                dataListener.onConfessionsChanged(new ArrayList<Confession>(allConfessions));
                             } else {
-                                dataListener.onConfessionsAdded(confessions);
+                                dataListener.onConfessionsAdded(addedConfessions);
                             }
                         }
-                        ConfessionActivity.processing = false;
+                        MainActivity.processing = false;
                     }
 
                     @Override
@@ -102,8 +121,10 @@ public class ConfessionsViewModel implements ViewModel {
 
                     @Override
                     public void onNext(List<Confession> confessions) {
-                        Log.i("Tag", "Confessions loaded " + confessions);
-                        ConfessionsViewModel.this.confessions = confessions;
+                        //Log.i("Tag", "Confessions loaded " + confessions);
+                        ConfessionsViewModel.this.addedConfessions = confessions;
+                        if(lastConfId == -1) ConfessionsViewModel.this.allConfessions.clear();
+                        ConfessionsViewModel.this.allConfessions.addAll(confessions);
                     }
                 });
     }

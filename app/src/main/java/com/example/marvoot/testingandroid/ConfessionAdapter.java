@@ -2,13 +2,14 @@ package com.example.marvoot.testingandroid;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.example.marvoot.testingandroid.Model.Confession;
-import com.example.marvoot.testingandroid.View.ConfessionActivity;
 import com.example.marvoot.testingandroid.View.MainActivity;
 import com.example.marvoot.testingandroid.ViewModel.ConfItemViewModel;
 import com.example.marvoot.testingandroid.ViewModel.ConfessionsViewModel;
@@ -32,8 +33,12 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
         this.confessions = confessions;
     }
 
+    public void clearConfessions() {
+        this.confessions.clear();
+    }
+
     public void setConfessions(List<Confession> confessions) {
-        this.confessions = null;
+        //this.confessions.clear();
         this.confessions = confessions;
     }
 
@@ -80,22 +85,6 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
             @Override
             public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
                 //you are swiping.
-                if(!ConfessionActivity.processing) {
-                    ConfessionActivity.processing = true;
-                    int confId = Integer.parseInt(holder.neutral_binding.swipe.getTag(R.string.ConfId).toString());
-                    int direction = 0;
-                    if (leftOffset > 0) {
-                        ConfessionActivity.confessionsViewModel.ForwardInteraction(1, confId, -1);//Web service
-                        direction = 1;
-                        ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);//Layout
-                    } else if (leftOffset < 0) {
-                        ConfessionActivity.confessionsViewModel.BackwardInteraction(1, confId, -1);
-                        direction = -1;
-                        ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
-                    }
-                    holder.neutral_binding.swipe.removeSwipeListener(this);
-                    ConfessionActivity.processing = false;
-                }
             }
 
             @Override
@@ -116,6 +105,32 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
             @Override
             public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
                 //when user's hand released.
+                if(!MainActivity.processing) {
+                    Log.e("OnUpdate left out", xvel+"");
+                    Log.e("OnUpdate top out", yvel+"");
+                    MainActivity.processing = true;
+                    int confId = Integer.parseInt(holder.neutral_binding.swipe.getTag(R.string.ConfId).toString());
+                    int direction = 0;
+                    if(xvel == 0) {
+                        direction = 0;
+                        MainActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
+                        holder.neutral_binding.swipe.removeSwipeListener(this);
+                    } else {
+                        String drag = layout.getDragEdge().toString();
+                        if (drag == "Left") {
+                            MainActivity.confessionsViewModel.ForwardInteraction(1, confId, -1);//Web service
+                            direction = 1;
+                            MainActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);//Layout
+                            holder.neutral_binding.swipe.removeSwipeListener(this);
+                        } else if (drag == "Right") {
+                            MainActivity.confessionsViewModel.BackwardInteraction(1, confId, -1);
+                            direction = -1;
+                            MainActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
+                            holder.neutral_binding.swipe.removeSwipeListener(this);
+                        }
+                    }
+                    MainActivity.processing = false;
+                }
             }
         });
     }
