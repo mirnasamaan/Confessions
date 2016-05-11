@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.databinding.DataBindingUtil;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.marvoot.testingandroid.ConfessionAdapter;
 import com.example.marvoot.testingandroid.Model.Confession;
@@ -20,6 +21,7 @@ import com.example.marvoot.testingandroid.Model.UserData;
 import com.example.marvoot.testingandroid.R;
 import com.example.marvoot.testingandroid.ViewModel.ConfessionsViewModel;
 import com.example.marvoot.testingandroid.databinding.ActivityConfessionsBinding;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +32,11 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
 
     public static ConfessionsViewModel confessionsViewModel;
     private ActivityConfessionsBinding binding;
-    private Subscription subscription;
     private static final String CONFESSION = "CONFESSION";
     SwipeRefreshLayout swipeRefreshLayout;
-    private ArrayList<Confession> confList;
     public static boolean processing = false;
+    public static boolean atrees = false;
+    public static boolean meratAtrees = false;
     int page = 0;
     int count = 6;
     int lastConfId = -1;
@@ -51,7 +53,7 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
         binding = DataBindingUtil.setContentView(this, R.layout.activity_confessions);
         confessionsViewModel = new ConfessionsViewModel(this, this);
         binding.setViewModel(confessionsViewModel);
-        setupRecyclerView((RecyclerView) findViewById(R.id.recycler_view));
+        //setupRecyclerView((RecyclerView) findViewById(R.id.recycler_view));
         if(!processing){
             processing=true;
             confessionsViewModel.loadConfessions(lastConfId, 0, count, "latest");
@@ -104,13 +106,15 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
         adapter.setConfessions(fetchedConfessions);
         //adapter.notifyDataSetChanged();
         binding.recyclerView.setAdapter(adapter);
+        //ConfessionActivity.processing = false;
         //adapter.notifyItemRangeChanged(0, adapter.getItemCount());
     }
 
     public void onConfessionsAdded(List<Confession> confessions) {
         ConfessionAdapter adapter = (ConfessionAdapter) binding.recyclerView.getAdapter();
         adapter.addConfessions(confessions);
-        adapter.notifyItemRangeChanged(adapter.getItemCount(), count);
+        adapter.notifyItemRangeChanged(adapter.getItemCount(), confessions.size());
+        //ConfessionActivity.processing = false;
     }
 
     public void userInteraction(int position) {
@@ -133,24 +137,40 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                int last = layoutManager.getItemCount();
-                int last_visible = layoutManager.findLastVisibleItemPosition();
-                if (last == last_visible + 1) {
-                    View lastItem = layoutManager.findViewByPosition(last_visible);
-                    lastConfId = Integer.parseInt(lastItem.getTag(R.string.ConfId).toString());
-
-                    page++;
-                    if (!processing) {
-                        processing = true;
-                        confessionsViewModel.loadConfessions(lastConfId, 0, count, "latest");
-                    }
-                }
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
+                //super.onScrolled(recyclerView, dx, dy);
+                if (!processing) {
+                    processing = true;
+                //if (!meratAtrees) {
+                //    if (dy > 0) {
+                //        if (!atrees) {
+                //            atrees = true;
+                            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                            int no = layoutManager.getItemCount();
+                            int last_visible = layoutManager.findLastVisibleItemPosition();
+                            if (no == last_visible + 1) {
+                                View lastItem = layoutManager.findViewByPosition(no - 1);
+                                lastConfId = Integer.parseInt(lastItem.getTag(R.string.ConfId).toString());
+
+                                page++;
+
+                                confessionsViewModel.loadConfessions(lastConfId, 0, count, "latest");
+                                // binding.recyclerView.stopScroll();
+                                //atrees = false;
+
+                            //} else
+                            //    atrees = false;
+                        //}
+                    //}
+                    //Log.i("atrees was here", atrees + "");
+                }
+                    else{
+                                processing = false;
+                            }
+                }
             }
         });
     }

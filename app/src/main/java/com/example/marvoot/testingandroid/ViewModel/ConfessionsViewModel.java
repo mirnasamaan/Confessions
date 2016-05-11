@@ -1,7 +1,7 @@
 package com.example.marvoot.testingandroid.ViewModel;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.example.marvoot.testingandroid.ConfApplication;
@@ -11,15 +11,9 @@ import com.example.marvoot.testingandroid.Model.Confession;
 import com.example.marvoot.testingandroid.Model.ConfessionService;
 import com.example.marvoot.testingandroid.Model.ConfessionsFilter;
 import com.example.marvoot.testingandroid.View.ConfessionActivity;
-import com.example.marvoot.testingandroid.View.MainActivity;
-import com.example.marvoot.testingandroid.databinding.ActivityConfessionsBinding;
-import com.example.marvoot.testingandroid.databinding.NeutralConfessionBinding;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -34,7 +28,7 @@ public class ConfessionsViewModel implements ViewModel {
     private Subscription subscription;
     private ConfessionService.DataListener dataListener;
     private List<Confession> addedConfessions;
-    private ArrayList<Confession> allConfessions = new ArrayList<Confession>();
+    public ArrayList<Confession> allConfessions = new ArrayList<Confession>();
 
     public ConfessionsViewModel(Context context, ConfessionService.DataListener dataListener) {
         this.context = context;
@@ -65,9 +59,13 @@ public class ConfessionsViewModel implements ViewModel {
                 switch (inter_type) {
                     case "-1":
                         confItemViewModel.setLoggedInUserInteractionType(0);
+                        int dislikesCount = Integer.parseInt(confItemViewModel.getConfDislikesCount());
+                        confItemViewModel.setConfDislikesCount(dislikesCount - 1);
                         break;
                     case "0":
                         confItemViewModel.setLoggedInUserInteractionType(1);
+                        int likesCount = Integer.parseInt(confItemViewModel.getConfLikesCount());
+                        confItemViewModel.setConfLikesCount(likesCount + 1);
                         break;
                     default:
                         break;
@@ -76,9 +74,13 @@ public class ConfessionsViewModel implements ViewModel {
                 switch (inter_type) {
                     case "1":
                         confItemViewModel.setLoggedInUserInteractionType(0);
+                        int likesCount = Integer.parseInt(confItemViewModel.getConfLikesCount());
+                        confItemViewModel.setConfLikesCount(likesCount - 1);
                         break;
                     case "0":
                         confItemViewModel.setLoggedInUserInteractionType(-1);
+                        int dislikesCount = Integer.parseInt(confItemViewModel.getConfDislikesCount());
+                        confItemViewModel.setConfDislikesCount(dislikesCount + 1);
                         break;
                     default:
                         break;
@@ -88,7 +90,7 @@ public class ConfessionsViewModel implements ViewModel {
         }
         catch (Exception ex){
             Log.e("userInteractionError", ex.getMessage());
-            Log.e("userInteractionConfsize", this.allConfessions.size() + "");
+            Log.e("userInteractionConfSize", this.allConfessions.size() + "");
             //Log.e("userInteractionConf", this.confessions.get(0).ConfContent);
         }
     }
@@ -104,14 +106,19 @@ public class ConfessionsViewModel implements ViewModel {
                 .subscribe(new Subscriber<List<Confession>>() {
                     @Override
                     public void onCompleted() {
-                        if (dataListener != null) {
-                            if (lastConfId == -1) {
-                                //ArrayList<Confession> fetchedConfessions = new ArrayList<Confession>(allConfessions);
-                                dataListener.onConfessionsChanged(new ArrayList<Confession>(allConfessions));
-                            } else {
-                                dataListener.onConfessionsAdded(addedConfessions);
+                            if (addedConfessions.size() > 0) {
+                                if (dataListener != null) {
+                                    if (lastConfId == -1) {
+                                        dataListener.onConfessionsChanged(new ArrayList<Confession>(allConfessions));
+                                    } else {
+                                        dataListener.onConfessionsAdded(addedConfessions);
+                                        for (int i = 0 ; i< addedConfessions.size(); i++) {
+                                            Log.i("AddedConfessions: " , addedConfessions.get(i).getConfId());
+                                        }
+                                    }
+                                }
                             }
-                        }
+                        ConfessionActivity.atrees = false;
                         ConfessionActivity.processing = false;
                     }
 
@@ -124,8 +131,13 @@ public class ConfessionsViewModel implements ViewModel {
                     public void onNext(List<Confession> confessions) {
                         //Log.i("Tag", "Confessions loaded " + confessions);
                         ConfessionsViewModel.this.addedConfessions = confessions;
-                        if(lastConfId == -1) ConfessionsViewModel.this.allConfessions.clear();
-                        ConfessionsViewModel.this.allConfessions.addAll(confessions);
+                        if (confessions.size() > 0) {
+
+                            if (lastConfId == -1) ConfessionsViewModel.this.allConfessions.clear();
+                            ConfessionsViewModel.this.allConfessions.addAll(confessions);
+                        } else {
+                            ConfessionActivity.meratAtrees = true;
+                        }
                     }
                 });
     }
@@ -141,7 +153,7 @@ public class ConfessionsViewModel implements ViewModel {
                 .subscribe(new Subscriber() {
                     @Override
                     public void onCompleted() {
-
+                        ConfessionActivity.processing = false;
                     }
 
                     @Override
@@ -168,7 +180,7 @@ public class ConfessionsViewModel implements ViewModel {
                 .subscribe(new Subscriber() {
                     @Override
                     public void onCompleted() {
-
+                        ConfessionActivity.processing = false;
                     }
 
                     @Override
