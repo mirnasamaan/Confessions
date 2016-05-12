@@ -15,9 +15,16 @@ import com.example.marvoot.testingandroid.View.MainActivity;
 import com.example.marvoot.testingandroid.ViewModel.ConfItemViewModel;
 import com.example.marvoot.testingandroid.ViewModel.ConfessionsViewModel;
 import com.example.marvoot.testingandroid.databinding.NeutralConfessionBinding;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 /**
  * Created by Marvoot on 4/11/2016.
@@ -25,9 +32,13 @@ import java.util.List;
 public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.ConfessionViewHolder> {
     private List<Confession> confessions;
     int count = 0;
+    //private ArrayList<NameValuePair> swipeListeners;
+    boolean mirvatFlag;
+    private HashMap<Integer, SwipeLayout.SwipeListener> swipeListeners;
 
     public ConfessionAdapter() {
         this.confessions = Collections.emptyList();
+        this.swipeListeners = new HashMap<Integer, SwipeLayout.SwipeListener>();
     }
 
     public ConfessionAdapter(List<Confession> confessions) {
@@ -36,6 +47,8 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
 
     public void clearConfessions() {
         this.confessions.clear();
+        this.swipeListeners.clear();
+        this.mirvatFlag = false;
     }
 
     public void setConfessions(List<Confession> confessions) {
@@ -67,8 +80,9 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
     @Override
     public void onBindViewHolder(final ConfessionViewHolder holder, final int position) {
         holder.bindConfession(confessions.get(position));
-
-        int confId = confessions.get(position).ConfId;
+        boolean hasSwipeListner = false;
+        final int confId = confessions.get(position).ConfId;
+        holder.neutral_binding.listitem.setTag(R.string.ConfId, confId);
         holder.neutral_binding.swipe.setTag(R.string.ConfId, confId);
 
         // Drag From Left
@@ -77,63 +91,91 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
         // Drag From Right
         holder.neutral_binding.swipe.addDrag(SwipeLayout.DragEdge.Right, holder.neutral_binding.bottomWrapper);
 
-        holder.neutral_binding.swipe.addSwipeListener(new SwipeLayout.SwipeListener() {
-            @Override
-            public void onClose(SwipeLayout layout) {
-                //when the SurfaceView totally cover the BottomView.
-            }
+        for (Map.Entry<Integer, SwipeLayout.SwipeListener> pair : swipeListeners.entrySet())
+            if (pair.getKey() == confId)
+                hasSwipeListner = true;
 
-            @Override
-            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-                //you are swiping.
-            }
-
-            @Override
-            public void onStartOpen(SwipeLayout layout) {
-
-            }
-
-            @Override
-            public void onOpen(SwipeLayout layout) {
-                //when the BottomView totally show.
-            }
-
-            @Override
-            public void onStartClose(SwipeLayout layout) {
-
-            }
-
-            @Override
-            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-                //when user's hand released.
-                if(!ConfessionActivity.processing) {
-                    Log.e("OnUpdate left out", xvel+"");
-                    Log.e("OnUpdate top out", yvel+"");
-                    ConfessionActivity.processing = true;
-                    int confId = Integer.parseInt(holder.neutral_binding.swipe.getTag(R.string.ConfId).toString());
-                    int direction = 0;
-                    if(xvel == 0) {
-                        direction = 0;
-                        ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
-                        holder.neutral_binding.swipe.removeSwipeListener(this);
-                    } else {
-                        String drag = layout.getDragEdge().toString();
-                        if (drag == "Left") {
-                            ConfessionActivity.confessionsViewModel.ForwardInteraction(1, confId, -1);//Web service
-                            direction = 1;
-                            ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);//Layout
-                            holder.neutral_binding.swipe.removeSwipeListener(this);
-                        } else if (drag == "Right") {
-                            ConfessionActivity.confessionsViewModel.BackwardInteraction(1, confId, -1);
-                            direction = -1;
-                            ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
-                            holder.neutral_binding.swipe.removeSwipeListener(this);
-                        }
-                    }
-                    ConfessionActivity.processing = false;
+        //if(!hasSwipeListner) {
+            Log.i("AddingSwipeListner:Con ", confId + "");
+            SwipeLayout.SwipeListener mirvat = new SwipeLayout.SwipeListener() {
+                @Override
+                public void onClose(SwipeLayout layout) {
+                    //when the SurfaceView totally cover the BottomView.
                 }
-            }
-        });
+
+                @Override
+                public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+                    //you are swiping.
+                }
+
+                @Override
+                public void onStartOpen(SwipeLayout layout) {
+
+                }
+
+                @Override
+                public void onOpen(SwipeLayout layout) {
+                    //when the BottomView totally show.
+                }
+
+                @Override
+                public void onStartClose(SwipeLayout layout) {
+
+                }
+
+                @Override
+                public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+                    //when user's hand released.
+                    if (!ConfessionActivity.processing) {
+                        Log.i("processing semaphore = ", ConfessionActivity.processing + "");
+                        Log.i("xvel = ", xvel + "");
+                        ConfessionActivity.processing = true;
+                        int confId = Integer.parseInt(holder.neutral_binding.listitem.getTag(R.string.ConfId).toString());
+                        Log.i("confid = ", confId + "");
+                        int direction = 0;
+                        //Log.e("xvel = ", Float.toString(xvel));
+                        if (xvel == 0) {
+                            ConfessionActivity.processing = false;
+                        /*Log.i("xvel value: ", Float.toString(xvel));*/
+                            direction = 0;
+                            ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
+                       /* holder.neutral_binding.swipe.removeSwipeListener(this);*/
+                            return;
+
+                        } else {
+                            String drag = layout.getDragEdge().toString();
+                            if (drag == "Left") {
+                            /*if(xvel == 0) {
+                                ConfessionActivity.processing = false;
+                                return;
+                            }*/
+                                ConfessionActivity.confessionsViewModel.ForwardInteraction(1, confId, -1);//Web service
+                                direction = 1;
+                                ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);//Layout
+                                //holder.neutral_binding.swipe.removeSwipeListener(this);
+                            } else if (drag == "Right") {
+                            /*if(xvel == 0) {
+                                ConfessionActivity.processing = false;
+                                return;
+                            }*/
+                                ConfessionActivity.confessionsViewModel.BackwardInteraction(1, confId, -1);
+                                //direction=xvel == 0?0:-1;
+                                direction = -1;
+                                ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
+                                //holder.neutral_binding.swipe.removeSwipeListener(this);
+                            }
+                        }
+                        //ConfessionActivity.processing = false;
+                    }
+                }
+            };
+            holder.neutral_binding.swipe.removeSwipeListener(mirvat);
+            holder.neutral_binding.swipe.addSwipeListener(mirvat);
+        if(!hasSwipeListner) {
+            swipeListeners.put(confId, mirvat);
+        }
+        //}
+        holder.neutral_binding.swipe.addSwipeListener(mirvat);
     }
 
     public class ConfessionViewHolder extends RecyclerView.ViewHolder {

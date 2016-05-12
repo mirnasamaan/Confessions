@@ -22,6 +22,9 @@ public interface ConfessionService {
     @POST("Confession/ListConfessions")
     Observable<List<Confession>> ListConfessions(@Body ConfessionsFilter filter);
 
+    @POST("Confession/ShowConfessionById")
+    Observable<Confession> GetConfessionById(@Body ConfessionId confId);
+
     @POST("Interaction/ForwardInteraction")
     Observable<List<Confession>> ForwardInteraction(@Body UserInteraction interaction);
 
@@ -31,12 +34,11 @@ public interface ConfessionService {
     @POST("User/Register")
     Observable<UserData> Register(@Body UserDataFilter filter);
 
-
     @POST("User/UserLogin")
     Observable<UserData> UserLogin(@Body UserDataFilter filter);
 
-    /*@POST("Interaction/CheckUserInteraction")
-    Observable<CheckUserInteraction> CheckUserInteraction(@Body UserInteraction interaction);*/
+    @POST("Comment/ListComments")
+    Observable<List<Comment>> ListComments(@Body CommentsFilter filter);
 
     class Factory {
         public static ConfessionService create() {

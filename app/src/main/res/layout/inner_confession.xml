@@ -5,69 +5,31 @@
 
     <data>
         <import type="android.view.View"/>
+        <variable name="conf" type="com.example.marvoot.testingandroid.Model.Confession"/>
         <variable
             name="viewModel"
-            type="com.example.marvoot.testingandroid.ViewModel.ConfItemViewModel" />
-
+            type="com.example.marvoot.testingandroid.ViewModel.InnerConfessionViewModel" />
     </data>
 
-    <com.daimajia.swipe.SwipeLayout
-        xmlns:swipe="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/swipe"
+    <LinearLayout
+        android:id="@+id/confItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        swipe:leftEdgeSwipeOffset="0dp"
-        swipe:rightEdgeSwipeOffset="0dp">
-
-        <LinearLayout
-            android:id="@+id/bottom_wrapper1"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:weightSum="1">
-
-            <ImageButton
-                android:id="@+id/btnLocation"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@null"
-                android:gravity="center"
-                android:src="@android:drawable/ic_dialog_info" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/bottom_wrapper"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:weightSum="1">
-
-            <ImageButton
-                android:id="@+id/tvEdit"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@null"
-                android:gravity="center"
-                android:src="@android:drawable/ic_dialog_info" />
-
-        </LinearLayout>
-
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <!-- Top View,  Row itemView of RecyclerView -->
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="3dp"
-            android:clickable="true">
+            android:padding="3dp">
             <LinearLayout android:id="@+id/listitem"
                 android:orientation="horizontal"
                 android:background="@drawable/conf_border"
                 android:minHeight="100dp"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:radius="5px"
-                android:onClick="@{viewModel.goToConfession}">
+                android:radius="5px">
                 <LinearLayout
                     android:layout_weight="4"
                     android:layout_width="0dp"
@@ -87,7 +49,7 @@
                                 android:id="@+id/ConfessionText"
                                 style="@style/ConfessionText"
                                 android:textDirection="rtl"
-                                android:text="@{viewModel.ConfContent}" />
+                                android:text="@{viewModel.confessionObservable.getConfContent}" />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="fill_parent"
@@ -105,13 +67,13 @@
                                     android:layout_weight="1"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:text="@{viewModel.getConfCommentsCount}"/>
+                                    android:text="@{viewModel.confessionObservable.ConfCommentsCount}"/>
                                 <TextView
                                     android:layout_weight="4"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:gravity="right"
-                                    android:text="@{viewModel.getConfTimestamp}"
+                                    android:text="@{viewModel.confessionObservable.ConfTimestamp}"
                                     />
                                 <TextView
                                     android:layout_weight="3"
@@ -137,7 +99,7 @@
                         android:minHeight="80dp"
                         android:weightSum="4"
                         android:orientation="vertical"
-                        android:visibility='@{viewModel.LoggedInUserInteractionType == String.valueOf(-1) ? View.VISIBLE : View.GONE}' >
+                        android:visibility='@{viewModel.confessionObservable.LoggedInUserInteractionType == String.valueOf(-1) ? View.VISIBLE : View.GONE}' >
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -163,7 +125,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="0dp"
-                                android:text="@{viewModel.ConfDislikesCount}"
+                                android:text="@{viewModel.confessionObservable.ConfDislikesCount}"
                                 android:textColor="@android:color/white"
                                 android:layout_weight="1"
                                 android:gravity="top|center_horizontal"/>
@@ -175,7 +137,7 @@
                             <Button
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:text="@{viewModel.ConfLikesCount}"
+                                android:text="@{viewModel.confessionObservable.ConfLikesCount}"
                                 android:textColor="#ffffff"
                                 android:background="@drawable/like_count"/>
                         </LinearLayout>
@@ -187,7 +149,7 @@
                         android:minHeight="80dp"
                         android:weightSum="4"
                         android:orientation="vertical"
-                        android:visibility='@{viewModel.LoggedInUserInteractionType == String.valueOf(1) ? View.VISIBLE : View.GONE}' >
+                        android:visibility='@{viewModel.confessionObservable.LoggedInUserInteractionType == String.valueOf(1) ? View.VISIBLE : View.GONE}' >
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -212,7 +174,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="0dp"
-                                android:text="@{viewModel.ConfLikesCount}"
+                                android:text="@{viewModel.confessionObservable.ConfLikesCount}"
                                 android:textColor="@android:color/white"
                                 android:layout_weight="1"
                                 android:gravity="top|center_horizontal"/>
@@ -224,7 +186,7 @@
                             <Button
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:text="@{viewModel.ConfDislikesCount}"
+                                android:text="@{viewModel.confessionObservable.ConfDislikesCount}"
                                 android:textColor="#ffffff"
                                 android:background="@drawable/dislike_count"/>
                         </LinearLayout>
@@ -236,7 +198,7 @@
                         android:minHeight="80dp"
                         android:weightSum="4"
                         android:orientation="vertical"
-                        android:visibility='@{viewModel.LoggedInUserInteractionType == String.valueOf(0) ? View.VISIBLE : View.GONE}'>
+                        android:visibility='@{viewModel.confessionObservable.LoggedInUserInteractionType == String.valueOf(0) ? View.VISIBLE : View.GONE}'>
 
                         <LinearLayout
                             android:layout_width="fill_parent"
@@ -256,7 +218,7 @@
                                 android:layout_weight="1"
                                 android:gravity="top|center_horizontal"
                                 android:textColor="@android:color/white"
-                                android:text="@{viewModel.ConfLikesCount}" />
+                                android:text="@{viewModel.confessionObservable.ConfLikesCount}" />
                         </LinearLayout>
                         <TextView
                             android:layout_width="fill_parent"
@@ -277,7 +239,7 @@
                             <TextView
                                 android:layout_width="fill_parent"
                                 android:layout_height="fill_parent"
-                                android:text="@{viewModel.ConfDislikesCount}"
+                                android:text="@{viewModel.confessionObservable.ConfDislikesCount}"
                                 android:textColor="@android:color/white"
                                 android:layout_weight="1"
                                 android:gravity="top|center_horizontal"/>
@@ -290,5 +252,20 @@
 
         </LinearLayout >
 
-    </com.daimajia.swipe.SwipeLayout>
+
+        <LinearLayout
+            android:id="@+id/comments_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/comments_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:scrollbars="vertical" />
+        </LinearLayout>
+    </LinearLayout>
+
 </layout>

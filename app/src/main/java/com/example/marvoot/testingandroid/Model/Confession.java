@@ -1,5 +1,7 @@
 package com.example.marvoot.testingandroid.Model;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -14,7 +16,7 @@ import java.util.List;
 /**
  * Created by Marvoot on 4/11/2016.
  */
-public class Confession implements Parcelable {
+public class Confession extends BaseObservable implements Parcelable {
     public int ConfId;
     public String ConfTitle;
     public String ConfContent;
@@ -111,6 +113,43 @@ public class Confession implements Parcelable {
         this.ConfCommentsCount = in.readInt();
         this.LoggedInUserInteractionType = in.readInt();
     }
+
+    @Bindable
+    public String getConfId() {
+        return Integer.toString(this.ConfId);
+    }
+    @Bindable
+    public String getConfTitle() {
+        return this.ConfTitle;
+    }
+    @Bindable
+    public String getConfContent() {
+        return this.ConfContent;
+    }
+    @Bindable
+    public String getConfLocation() {
+        return this.ConfLocation;
+    }
+    @Bindable
+    public String getConfTimestamp() {
+        return this.ConfTimestamp;
+    }
+    @Bindable
+    public String getConfUsername() {
+        return this.ConfUsername;
+    }
+    @Bindable
+    public String getConfUserId() { return Integer.toString(this.ConfUserId); }
+    @Bindable
+    public String getConfCatId() { return  Integer.toString(this.ConfCatId); }
+    @Bindable
+    public String getConfDislikesCount() { return Integer.toString(this.ConfDislikesCount); }
+    @Bindable
+    public String getConfLikesCount() { return Integer.toString(this.ConfLikesCount); }
+    @Bindable
+    public String getConfCommentsCount() { return Integer.toString(this.ConfCommentsCount); }
+    @Bindable
+    public String getLoggedInUserInteractionType() { return Integer.toString(this.LoggedInUserInteractionType); }
 
     public static final Parcelable.Creator<Confession> CREATOR = new Parcelable.Creator<Confession>() {
         public Confession createFromParcel(Parcel source) {
