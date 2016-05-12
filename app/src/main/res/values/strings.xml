@@ -4,9 +4,19 @@
     <string name="ConfId">ConfId</string>
     <string name="login_text_main">CONFESSIONS</string>
     <string name="register_text_main">CONFESSIONS</string>
+    <string name="logo_text_main">CONFESSIONS</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="menu_item_refresh">Refresh</string>
+    <string name="offline">You are offline</string>
     <string name="data1">ة كل, كما ان أملاً بوابة نهاية.></string>
     <string name="data2">يعادل وإعلان عرض إذ. هامش هناك ٣٠ عدم. ما ساعة الثالث، الأوربيين وقد, تعد والقرى استبدال اليميني ان. أخذ سياسة الأراضي وحلفاؤها قد, لمّ ان ويكيبيديا، الأوروبية،. مع الدمج المضي أطراف قام, وقد في معزّزة وقوعها،. الى احداث بالفشل الإتفاقية كل, كما ان أملاً بوابة نهاية.</string>
     <string name="data3">يعادل وإعلان عرض إذ. هامش هناك ٣٠ عدم. ما ساعة الثالث، الأوربيين وقد, تعد والقرى استبدال اليميني ان. أخذ سياسة الأراضي وحلفاؤها قد, لمّ ان ويكيبيديا، الأوروبية،. مع الدمج المضي أطراف قام, وقد في معزّزة وقوعها،. الى احداث بالفشل الإتفاقية كل, كما ان أملاً بوابة نهاية.
 
 التي السيطرة التنازلي بين ما, لكل الهادي شموليةً تم, حول مع ماشاء الثالث،. بال أم تجهيز وبحلول الجديدة،, بالرّد أفريقيا أوراقهم تلك و. أخذ أم اعتداء بلديهما بالمحور. لان لعدم الحكم السفن ان, هو واُسدل بتطويق كما, بال والفلبين المتساقطة، الإقتصادية ما. إذ تلك لأداء الأخذ, ثم انه خلاف يتبقّ, تم يتم الأولى الشمال. كما ان عقبت وبدأت للجزر. بحق اللا معزّزة عل.</string>
+    <string-array name="drawer_list">
+        <item>Write Confession</item>
+        <item>Terms and Conditions</item>
+        <item>Logout</item>
+    </string-array>
 </resources>

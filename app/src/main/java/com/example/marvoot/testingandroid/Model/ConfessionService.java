@@ -16,6 +16,9 @@ import rx.Observable;
  */
 public interface ConfessionService {
 
+    @POST("Confession/WriteConfession")
+    Observable<Confession> WriteConfession(@Body WriteConfessionFilter filter);
+
     @POST("Confession/ListConfessions")
     Observable<List<Confession>> ListConfessions(@Body ConfessionsFilter filter);
 
@@ -38,7 +41,7 @@ public interface ConfessionService {
     class Factory {
         public static ConfessionService create() {
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://192.168.1.8/ConfAPI/api/")
+                    .baseUrl("http://192.168.1.2/ConfAPI/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                     .build();

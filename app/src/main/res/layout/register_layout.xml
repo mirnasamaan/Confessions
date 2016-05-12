@@ -17,6 +17,28 @@
         android:background="@color/colorPrimary"
         android:clickable="true"
         android:focusableInTouchMode="true">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimaryDark"
+            android:minHeight="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            <!--<ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/people"/>-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/logo_text_main"
+                android:textColor="@color/White"
+                fontPath="Montserrat-Bold.ttf"
+                android:textSize="20dp"/>
+        </android.support.v7.widget.Toolbar>
 
         <LinearLayout
             android:orientation="vertical"
@@ -26,7 +48,7 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true">
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/register_text_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -34,10 +56,10 @@
                 android:textSize="@dimen/register_text_main_size"
                 android:text="@string/register_text_main"
                 android:paddingBottom="@dimen/register_text_main_bottom_padding"
-                fontPath="Montserrat-Bold.ttf"/>
+                fontPath="Montserrat-Bold.ttf"/>-->
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="match_parent"
+                android:layout_width="@dimen/register_sub_window_width"
                 android:layout_height="match_parent"
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:background="@drawable/border_radius_login_small_background"
@@ -64,6 +86,7 @@
                     android:drawableRight="@{viewModel.username_field_icon}"
                     android:hint=" |  الاسم"
                     android:textColorHint="@color/Login_Register_Fields"
+                    fontPath="DroidKufi.ttf"
                     android:gravity="right"
                     android:singleLine="true"
                     app:error="@{viewModel.username_field_error}"
@@ -80,6 +103,7 @@
                     android:hint=" |  كلمة السر"
                     android:layout_marginTop="@dimen/register_password_field_top_margin"
                     android:textColorHint="@color/Login_Register_Fields"
+                    fontPath="DroidKufi.ttf"
                     android:password="true"
                     android:gravity="right"
                     android:singleLine="true"
@@ -98,6 +122,7 @@
                     android:hint=" |  النوع"
                     android:layout_marginTop="@dimen/register_gender_field_top_margin"
                     android:textColorHint="@color/Login_Register_Fields"
+                    fontPath="DroidKufi.ttf"
                     android:textAlignment="textStart"
                     android:textSize="@dimen/register_gender_field_text_size"
                     android:text="@{viewModel.gender_text}"
@@ -119,6 +144,7 @@
                         android:text="انشاء"
                         android:background="@color/colorPrimary"
                         android:textColor="@color/White"
+                        fontPath="DroidKufi.ttf"
                         android:onClick="@{viewModel.onClickSearch}"/>
                 </LinearLayout>
             </LinearLayout>
@@ -162,6 +188,7 @@
                     android:layout_marginTop="@dimen/gender_popup_margin"
                     android:layout_marginRight="@dimen/gender_popup_margin"
                     android:layout_marginLeft="@dimen/gender_popup_margin"
+                    fontPath="DroidKufi.ttf"
                     android:onClick="@{viewModel.onClickMale}"/>
                 <Button
                     android:id="@+id/gender_female"
@@ -173,6 +200,7 @@
                     android:layout_marginRight="@dimen/gender_popup_margin"
                     android:layout_marginLeft="@dimen/gender_popup_margin"
                     android:layout_marginBottom="@dimen/gender_popup_margin"
+                    fontPath="DroidKufi.ttf"
                     android:onClick="@{viewModel.onClickFemale}"/>
             </LinearLayout>
         </RelativeLayout>

@@ -3,52 +3,48 @@ package com.example.marvoot.testingandroid.View;
 
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.databinding.DataBindingUtil;
 
+import com.example.marvoot.testingandroid.Model.Confession;
 import com.example.marvoot.testingandroid.Model.UserData;
 import com.example.marvoot.testingandroid.R;
-import com.example.marvoot.testingandroid.ViewModel.RegisterViewModel;
-import com.example.marvoot.testingandroid.databinding.RegisterLayoutBinding;
+import com.example.marvoot.testingandroid.ViewModel.MainViewModel;
+import com.example.marvoot.testingandroid.ViewModel.WriteConfessionViewModel;
+import com.example.marvoot.testingandroid.databinding.WriteConfessionBinding;
+
+import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
-public class RegisterActivity extends AppCompatActivity implements RegisterViewModel.DataListener {
+public class WriteConfessionActivity extends AppCompatActivity implements WriteConfessionViewModel.DataListener {
 
 
-    private RegisterLayoutBinding binding;
-    private RegisterViewModel registerViewModel;
-    private static final String REGISTER = "REGISTER";
+    private WriteConfessionBinding binding;
+    private WriteConfessionViewModel writeConfessionViewModel;
+    private static final String WRITE = "WRITE";
 
 
-    public static Intent newIntent(Context context, UserData userData) {
-        Intent intent = new Intent(context, RegisterActivity.class);
-        intent.putExtra(REGISTER, userData);
+    public static Intent newIntent(Context context, Confession confession) {
+        Intent intent = new Intent(context, WriteConfessionActivity.class);
+        intent.putExtra(WRITE, confession);
         return intent;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.register_layout);
-        registerViewModel = new RegisterViewModel(this,this);
-        binding.setViewModel(registerViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.write_confession);
+        writeConfessionViewModel = new WriteConfessionViewModel(this, this);
+        binding.setViewModel(writeConfessionViewModel);
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        /*Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimary));*/
-
-
 
 
     }
@@ -75,7 +71,6 @@ public class RegisterActivity extends AppCompatActivity implements RegisterViewM
         /*if (id == R.id.refresh) {
             return true;
         }*/
-
         switch (item.getItemId()){
             case android.R.id.home: {
                 onBackPressed();
@@ -87,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity implements RegisterViewM
     }
 
     @Override
-    public void onUserDataChanged(UserData userdata) {
+    public void onConfessionChanged(Confession confession) {
     }
 
     @Override

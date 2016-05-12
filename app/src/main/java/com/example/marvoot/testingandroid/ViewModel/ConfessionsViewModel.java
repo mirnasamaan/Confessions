@@ -1,8 +1,10 @@
 package com.example.marvoot.testingandroid.ViewModel;
 
 import android.content.Context;
+import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 
 import com.example.marvoot.testingandroid.ConfApplication;
 import com.example.marvoot.testingandroid.ConfessionAdapter;
@@ -10,6 +12,9 @@ import com.example.marvoot.testingandroid.Model.UserInteraction;
 import com.example.marvoot.testingandroid.Model.Confession;
 import com.example.marvoot.testingandroid.Model.ConfessionService;
 import com.example.marvoot.testingandroid.Model.ConfessionsFilter;
+import com.example.marvoot.testingandroid.PublicFunctions.AlertMessages;
+import com.example.marvoot.testingandroid.PublicFunctions.CheckInternetConnection;
+import com.example.marvoot.testingandroid.PublicFunctions.PopupMessages;
 import com.example.marvoot.testingandroid.View.ConfessionActivity;
 import com.example.marvoot.testingandroid.View.MainActivity;
 import com.example.marvoot.testingandroid.databinding.ActivityConfessionsBinding;
@@ -35,10 +40,16 @@ public class ConfessionsViewModel implements ViewModel {
     private ConfessionService.DataListener dataListener;
     private List<Confession> addedConfessions;
     private ArrayList<Confession> allConfessions = new ArrayList<Confession>();
+    public ObservableInt listVisibility;
+    public ObservableInt offlineVisibility;
+    AlertMessages alertMessages;
 
     public ConfessionsViewModel(Context context, ConfessionService.DataListener dataListener) {
         this.context = context;
         this.dataListener = dataListener;
+        listVisibility = new ObservableInt(View.VISIBLE);
+        offlineVisibility = new ObservableInt(View.GONE);
+        alertMessages = new AlertMessages();
     }
 
     public void setDataListener(ConfessionService.DataListener dataListener) {
@@ -94,40 +105,62 @@ public class ConfessionsViewModel implements ViewModel {
     }
 
     public void loadConfessions(final int lastConfId, int page, int count, String mode) {
-        ConfApplication application = ConfApplication.get(context);
-        final ConfessionService confessionService = application.getConfessionService();
-        if (subscription != null && !subscription.isUnsubscribed()) subscription.unsubscribe();
-        ConfessionsFilter filter = new ConfessionsFilter(1, lastConfId, page, count, mode);
-        subscription = confessionService.ListConfessions(filter)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(application.defaultSubscribeScheduler())
-                .subscribe(new Subscriber<List<Confession>>() {
-                    @Override
-                    public void onCompleted() {
-                        if (dataListener != null) {
-                            if (lastConfId == -1) {
-                                //ArrayList<Confession> fetchedConfessions = new ArrayList<Confession>(allConfessions);
-                                dataListener.onConfessionsChanged(new ArrayList<Confession>(allConfessions));
-                            } else {
-                                dataListener.onConfessionsAdded(addedConfessions);
+        alertMessages.ShowAlert(context, "Checking Network", "Loading..",false);
+        if (CheckInternetConnection.getInstance(context).isOnline())
+        {
+            //try{ Thread.sleep(3000); }catch(InterruptedException e){ }
+            alertMessages.HideAlert();
+            alertMessages.ShowAlert(context, "Please wait", "Loading..", false);
+            ConfApplication application = ConfApplication.get(context);
+            final ConfessionService confessionService = application.getConfessionService();
+            if (subscription != null && !subscription.isUnsubscribed()) subscription.unsubscribe();
+            ConfessionsFilter filter = new ConfessionsFilter(1, lastConfId, page, count, mode);
+            subscription = confessionService.ListConfessions(filter)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(application.defaultSubscribeScheduler())
+                    .subscribe(new Subscriber<List<Confession>>() {
+                        @Override
+                        public void onCompleted() {
+                            alertMessages.HideAlert();
+                            if (dataListener != null) {
+                                if (lastConfId == -1) {
+                                    //ArrayList<Confession> fetchedConfessions = new ArrayList<Confession>(allConfessions);
+                                    dataListener.onConfessionsChanged(new ArrayList<Confession>(allConfessions));
+                                } else {
+                                    dataListener.onConfessionsAdded(addedConfessions);
+                                }
                             }
+                            ConfessionActivity.processing = false;
                         }
-                        ConfessionActivity.processing = false;
-                    }
 
-                    @Override
-                    public void onError(Throwable error) {
-                        Log.e("Tag", "Error loading GitHub repos ", error);
-                    }
+                        @Override
+                        public void onError(Throwable error) {
+                            alertMessages.HideAlert();
+                            //Log.e("Tag", "Error loading GitHub repos ", error);
+                            PopupMessages popup = new PopupMessages();
+                            String error_msg = "Something went wrong..Please try again later";
+                            popup.showAlertDialog(context, "Sorry", error_msg, null);
+                        }
 
-                    @Override
-                    public void onNext(List<Confession> confessions) {
-                        //Log.i("Tag", "Confessions loaded " + confessions);
-                        ConfessionsViewModel.this.addedConfessions = confessions;
-                        if(lastConfId == -1) ConfessionsViewModel.this.allConfessions.clear();
-                        ConfessionsViewModel.this.allConfessions.addAll(confessions);
-                    }
-                });
+                        @Override
+                        public void onNext(List<Confession> confessions) {
+                            //Log.i("Tag", "Confessions loaded " + confessions);
+                            ConfessionsViewModel.this.addedConfessions = confessions;
+                            if(lastConfId == -1) ConfessionsViewModel.this.allConfessions.clear();
+                            ConfessionsViewModel.this.allConfessions.addAll(confessions);
+                        }
+                    });
+        }
+        else
+        {
+            alertMessages.HideAlert();
+            listVisibility = new ObservableInt(View.GONE);
+            offlineVisibility = new ObservableInt(View.VISIBLE);
+            PopupMessages popup = new PopupMessages();
+            String error = "You are offline";
+            popup.showAlertDialog(context, "Sorry", error, null);
+        }
+
     }
 
     public void ForwardInteraction(int userId, int confId, int commentId){

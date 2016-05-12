@@ -3,6 +3,7 @@ package com.example.marvoot.testingandroid.View;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -30,23 +31,30 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Dat
 
     private ActivityMainBinding binding;
     private MainViewModel mainViewModel;
+    private static final String LOGIN = "LOGIN";
+
+    public static Intent newIntent(Context context, UserData userData) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(LOGIN, userData);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SessionManagement new_session = new SessionManagement(this);
-        new_session.logoutUser();
+        //new_session.logoutUser();
         HashMap<String, String> hashMap = new HashMap<String, String>();
         hashMap = new_session.getUserDetails();
         String empty = "";
-        if (hashMap.get("name") != null && !hashMap.get("name").equals(empty) && hashMap.get("email") != null && !hashMap.get("email").equals(empty)) {
+        if (hashMap.get("username") != null && !hashMap.get("username").equals(empty) && hashMap.get("password") != null && !hashMap.get("password").equals(empty)) {
             /*CharSequence text = "You should be directed to the confessions list";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(this, text, duration);
             toast.show();*/
             UserData userData = new UserData();
-            userData.username = hashMap.get("name");
-            userData.password = hashMap.get("email");
+            userData.username = hashMap.get("username");
+            userData.password = hashMap.get("password");
             this.startActivity(ConfessionActivity.newIntent(this, userData));
             this.finish();
         }
@@ -72,13 +80,8 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Dat
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
+        //int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

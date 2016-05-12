@@ -29,4 +29,9 @@
     <dimen name="register_buttons_layout_bottom_padding">10dp</dimen>
     <dimen name="gender_popup_layout_width">200dp</dimen>
     <dimen name="gender_popup_margin">5dp</dimen>
+    <dimen name="write_confession_title_field_width">350dp</dimen>
+    <dimen name="write_confession_message_field_width">350dp</dimen>
+    <dimen name="write_confession_message_field_height">250dp</dimen>
+    <dimen name="login_sub_window_width">260dp</dimen>
+    <dimen name="register_sub_window_width">260dp</dimen>
 </resources>

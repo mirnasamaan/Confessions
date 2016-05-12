@@ -108,7 +108,8 @@ public class MainViewModel implements ViewModel {
                             {
                                 SessionManagement new_session = new SessionManagement(context);
                                 new_session.logoutUser();
-                                new_session.createLoginSession(userdata.username, userdata.password);
+                                String userID = Integer.toString(userdata.userId);
+                                new_session.createLoginSession(userID, userdata.username, userdata.password);
                                 /*CharSequence text = "You should be directed to the confessions list";
                                 int duration = Toast.LENGTH_SHORT;
                                 Toast toast = Toast.makeText(context, text, duration);
@@ -137,6 +138,7 @@ public class MainViewModel implements ViewModel {
 
                     @Override
                     public void onError(Throwable error) {
+                        alertMessages.HideAlert();
                         PopupMessages popup = new PopupMessages();
                         String error_msg = "Something went wrong..Please try again later";
                         popup.showAlertDialog(context, "Sorry", error_msg, null);
@@ -186,7 +188,7 @@ public class MainViewModel implements ViewModel {
     public void onClickRegister(View view) {
         UserData userData = new UserData();
         context.startActivity(RegisterActivity.newIntent(context, userData));
-        ((Activity) context).finish();
+        //((Activity) context).finish();
     }
 
 

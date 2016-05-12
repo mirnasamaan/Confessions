@@ -12,22 +12,24 @@ import android.view.MenuItem;
 import com.example.marvoot.testingandroid.Model.UserData;
 import com.example.marvoot.testingandroid.R;
 import com.example.marvoot.testingandroid.ViewModel.RegisterViewModel;
+import com.example.marvoot.testingandroid.ViewModel.TermsViewModel;
 import com.example.marvoot.testingandroid.databinding.RegisterLayoutBinding;
+import com.example.marvoot.testingandroid.databinding.TermsAndConditionsBinding;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
-public class RegisterActivity extends AppCompatActivity implements RegisterViewModel.DataListener {
+public class TermsActivity extends AppCompatActivity implements TermsViewModel.DataListener {
 
 
-    private RegisterLayoutBinding binding;
-    private RegisterViewModel registerViewModel;
-    private static final String REGISTER = "REGISTER";
+    private TermsAndConditionsBinding binding;
+    private TermsViewModel termsViewModel;
+    private static final String TERMS = "TERMS";
 
 
     public static Intent newIntent(Context context, UserData userData) {
-        Intent intent = new Intent(context, RegisterActivity.class);
-        intent.putExtra(REGISTER, userData);
+        Intent intent = new Intent(context, TermsActivity.class);
+        intent.putExtra(TERMS, userData);
         return intent;
     }
 
@@ -35,22 +37,13 @@ public class RegisterActivity extends AppCompatActivity implements RegisterViewM
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.register_layout);
-        registerViewModel = new RegisterViewModel(this,this);
-        binding.setViewModel(registerViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.terms_and_conditions);
+        termsViewModel = new TermsViewModel(this);
+        binding.setViewModel(termsViewModel);
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        /*Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimary));*/
-
-
-
-
     }
 
 
@@ -75,7 +68,6 @@ public class RegisterActivity extends AppCompatActivity implements RegisterViewM
         /*if (id == R.id.refresh) {
             return true;
         }*/
-
         switch (item.getItemId()){
             case android.R.id.home: {
                 onBackPressed();
