@@ -45,6 +45,7 @@ import com.example.marvoot.testingandroid.databinding.ActivityConfessionsBinding
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import rx.Subscription;
@@ -61,6 +62,8 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
     int page = 0;
     int count = 6;
     int lastConfId = -1;
+    SessionManagement new_session;
+    int userID;
 
     DrawerLayout mDrawerLayout;
     ListView mDrawerList;
@@ -299,7 +302,11 @@ public class ConfessionActivity extends AppCompatActivity implements ConfessionS
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
-        ConfessionAdapter adapter = new ConfessionAdapter();
+        new_session = new SessionManagement(this);
+        HashMap<String, String> hashMap = new HashMap<String, String>();
+        hashMap = new_session.getUserDetails();
+        userID = Integer.parseInt(hashMap.get("userid"));
+        ConfessionAdapter adapter = new ConfessionAdapter(userID);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

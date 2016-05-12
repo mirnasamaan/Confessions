@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.example.marvoot.testingandroid.Model.Confession;
+import com.example.marvoot.testingandroid.PublicFunctions.SessionManagement;
 import com.example.marvoot.testingandroid.View.ConfessionActivity;
 import com.example.marvoot.testingandroid.View.MainActivity;
 import com.example.marvoot.testingandroid.ViewModel.ConfItemViewModel;
@@ -35,10 +36,12 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
     //private ArrayList<NameValuePair> swipeListeners;
     boolean mirvatFlag;
     private HashMap<Integer, SwipeLayout.SwipeListener> swipeListeners;
+    int userID;
 
-    public ConfessionAdapter() {
+    public ConfessionAdapter(int userID) {
         this.confessions = Collections.emptyList();
         this.swipeListeners = new HashMap<Integer, SwipeLayout.SwipeListener>();
+        this.userID = userID;
     }
 
     public ConfessionAdapter(List<Confession> confessions) {
@@ -149,7 +152,7 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
                                 ConfessionActivity.processing = false;
                                 return;
                             }*/
-                                ConfessionActivity.confessionsViewModel.ForwardInteraction(1, confId, -1);//Web service
+                                ConfessionActivity.confessionsViewModel.ForwardInteraction(userID, confId, -1);//Web service
                                 direction = 1;
                                 ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);//Layout
                                 //holder.neutral_binding.swipe.removeSwipeListener(this);
@@ -158,7 +161,7 @@ public class ConfessionAdapter extends RecyclerView.Adapter<ConfessionAdapter.Co
                                 ConfessionActivity.processing = false;
                                 return;
                             }*/
-                                ConfessionActivity.confessionsViewModel.BackwardInteraction(1, confId, -1);
+                                ConfessionActivity.confessionsViewModel.BackwardInteraction(userID, confId, -1);
                                 //direction=xvel == 0?0:-1;
                                 direction = -1;
                                 ConfessionActivity.confessionsViewModel.userInteraction(holder.getAdapterPosition(), direction);
